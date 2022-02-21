@@ -1,31 +1,28 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+{% extends "base.html" %}
 
-{% block main %}
+{% block upload %}
+
 
 <div class="container">
-  <div class="row">
-    <div class="col">
-
-      <h1>Upload a file</h1>
-      <hr>
-
-      <form action="/" method="POST" enctype="multipart/form-data">
-
-        <div class="form-group">
-          <label>Select file</label>
-          <div class="custom-file">
-            <!--<input type="file" class="custom-file-input" name="file" id="file">-->
-            <input type="file" name="file[]" id="file" multiple>
-            <label class="custom-file-label" for="file">Select file...</label>
-          </div>
-        </div>
-
-        <button type="submit" value="add" class="btn btn-primary">Upload</button>
-
-      </form>
-
+  <form action="/" method="POST" enctype="multipart/form-data">
+    <div class="row g-2 justify-content-center">
+      <div class="col-auto">
+        <!-- <label for="file" class="form-label">select files to upload</label> -->
+        <input type="file" class="form-control " name="file[]" id="file" multiple>
+      </div>
+      <div class="col-auto">
+        <!-- <label for="file" class="form-label">no label</label> -->
+        <button type="submit" value="add" class="btn btn-outline-dark">Upload</button>
+      </div>
     </div>
-  </div>
+    <div class="row g-2 justify-content-center">
+      <div class="col-auto">
+        <br>
+        <p>combine one shot .wav files into a sample chain</p>
+      </div>
+    </div>
+  </form>
 </div>
+
 
 {% endblock %}
