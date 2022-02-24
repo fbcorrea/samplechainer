@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, request, redirect, Response
+from flask import render_template, request, redirect, make_response, flash
 from pydub import AudioSegment
 import glob
 import numpy
@@ -7,6 +7,7 @@ import os
 import uuid
 
 app = Flask(__name__)
+app.secret_key = "secret_key_samplechain"
 
 @app.route("/", methods=["GET", "POST"])
 def upload():
@@ -21,10 +22,17 @@ def upload():
 			
 			#print(uploaded_files)
 			# Check if there is no WAV file
+			# if len(uploaded_files) == 1:
+			# 	flash('Please provide more than one file!', category='error')
+			# 	return redirect(request.url)
+
 			for wav_file in uploaded_files:
-				if wav_file.content_type != "audio/x-wav":
-					print("File type not supported!")
-					#break
+				if wav_file.content_type not in ("audio/x-wav", "audio/wav"):
+					print(wav_file.content_type)
+					flash('File type not supported!', category='error')
+					return redirect(request.url)
+				elif len(uploaded_files) == 1:
+					flash('Please provide more than one file!', category='error')
 					return redirect(request.url)
 				else:
 					# load file as audiosegment object
@@ -54,21 +62,28 @@ def upload():
 				#print(sound_array[index].duration_seconds)
 				final_clip = final_clip + sound_array[index]
 
-			#print(final_clip)
+			# return final clip to client
 			final_clip_wav = final_clip.export(format="wav")
 
 			unique_filename = str(uuid.uuid4().hex)
 			print(unique_filename)
-			#file_test=(str.join('', ('"Content-Disposition":"attachment;filename=',unique_filename,'.wav"')))
-			return Response(final_clip_wav, mimetype="audio/x-wav",
-				headers={"Content-Disposition":"attachment;filename=test.wav"})
-				#headers={file_test})
-				
-			return redirect(request.url)
+			number_of_hits = str(len(sound_array))
+
+			response = make_response(final_clip_wav.read())
+			response.headers.set('Content-Type', 'audio/x-wav')
+			response.headers.set('Content-Disposition', 'attachment', 
+				filename=unique_filename+"_"+number_of_hits)
+			
+			return response
+			#return redirect(request.url)
+
+			#flash('File(s) successfully uploaded')
+			#return redirect(url_for('update'))
+			#return redirect('/')
 
 	return render_template("upload.html")
 
 
 if __name__ == '__main__':
 
-	app.run()
+	app.run(host='0.0.0.0', port=5000)
